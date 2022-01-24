@@ -1,0 +1,54 @@
+{
+  "name": "@merqva/telegram-passport",
+  "version": "0.0.1",
+  "description": "Decrypt/Parse incoming Telegram Passport data",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.js",
+  "scripts": {
+    "build": "npm run build:cjs && npm run build:esm && npm run build:types",
+    "build:cjs": "rimraf dist/cjs && tsc -p config/tsconfig.cjs.json",
+    "build:esm": "rimraf dist/esm && tsc -p config/tsconfig.esm.json",
+    "build:types": "rimraf dist/types && tsc -p config/tsconfig.types.json",
+    "package": "npm run build && npm pack"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "example",
+    "typescript",
+    "npm",
+    "package",
+    "sample",
+    "boilerplate",
+    "starter",
+    "demo",
+    "cjs",
+    "esm",
+    "umd"
+  ],
+  "author": "Yoel Navas <yn4v4s@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/merqva/telegram-passport",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:merqva/telegram-passport.git"
+  },
+  "bugs": {
+    "url": "https://github.com/merqva/telegram-passport/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.10",
+    "@typescript-eslint/eslint-plugin": "^4.31.1",
+    "@typescript-eslint/parser": "^4.31.1",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.4.0",
+    "typescript": "^4.4.3"
+  }
+}
