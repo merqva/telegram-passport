@@ -16,7 +16,7 @@ export class TelegramPassport {
   }
 
   private decryptData(data: Buffer, secret: Buffer, hash: Buffer) {
-    /* Use the secret and the the hash to calculate key and iv */
+    /* Use the secret and the hash to calculate key and iv */
     const hasher = createHash('sha512');
 
     /* Feed the hasher */
