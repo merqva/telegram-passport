@@ -19,17 +19,14 @@
     "dist"
   ],
   "keywords": [
-    "example",
+    "telegram",
+    "passport",
+    "crypto",
     "typescript",
     "npm",
     "package",
-    "sample",
-    "boilerplate",
-    "starter",
-    "demo",
     "cjs",
-    "esm",
-    "umd"
+    "esm"
   ],
   "author": "Yoel Navas <yn4v4s@gmail.com>",
   "license": "MIT",
