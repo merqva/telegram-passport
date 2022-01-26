@@ -4,15 +4,16 @@ import {
   createHash,
   privateDecrypt,
 } from 'crypto';
-import { PassportData } from './interfaces/passport-data';
+import {
+  Credentials,
+  EncryptedCredentials,
+  FileCredentials,
+  PassportFileAndCredentials,
+  PassportData,
+  RequestedFields,
+} from './interfaces';
 import { ErrorMessages } from './constants';
-import { Credentials } from './interfaces/credentials';
-import { EncryptedCredentials } from './interfaces/encrypted-credentials';
-import { Indexable, SecureDataKey } from './utils';
-import { RequestedFields } from './interfaces/requested-fields';
-import { SecureValueKey } from './utils/types';
-import { PassportFileAndCredentials } from './interfaces/passport-file-and-credentials';
-import { FileCredentials } from '.';
+import { Indexable, SecureDataKey, SecureValueKey } from './utils';
 
 export class TelegramPassport {
   private readonly privateKey: Buffer;

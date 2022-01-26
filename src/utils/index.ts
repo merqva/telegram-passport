@@ -1,2 +1,6 @@
-export { EncryptedPassportElementType, SecureDataKey } from './types';
+export {
+  EncryptedPassportElementType,
+  SecureDataKey,
+  SecureValueKey,
+} from './types';
 export { Indexable } from './indexable';
