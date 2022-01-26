@@ -4,9 +4,15 @@ import {
   createHash,
   privateDecrypt,
 } from 'crypto';
+import { PassportData } from './interfaces/passport-data';
 import { ErrorMessages } from './constants';
 import { Credentials } from './interfaces/credentials';
 import { EncryptedCredentials } from './interfaces/encrypted-credentials';
+import { Indexable, SecureDataKey } from './utils';
+import { RequestedFields } from './interfaces/requested-fields';
+import { SecureValueKey } from './utils/types';
+import { PassportFileAndCredentials } from './interfaces/passport-file-and-credentials';
+import { FileCredentials } from '.';
 
 export class TelegramPassport {
   private readonly privateKey: Buffer;
@@ -15,12 +21,22 @@ export class TelegramPassport {
     this.privateKey = Buffer.from(privateKey);
   }
 
-  private decryptData(data: Buffer, secret: Buffer, hash: Buffer) {
+  private decryptData(
+    data: string | Buffer,
+    secret: string | Buffer,
+    hash: string | Buffer,
+  ) {
+    /* Note that all non-Buffer fields should be Base64-decoded before use */
+    const _data = typeof data === 'string' ? Buffer.from(data, 'base64') : data;
+    const _secret =
+      typeof secret === 'string' ? Buffer.from(secret, 'base64') : secret;
+    const _hash = typeof hash === 'string' ? Buffer.from(hash, 'base64') : hash;
+
     /* Use the secret and the hash to calculate key and iv */
     const hasher = createHash('sha512');
 
     /* Feed the hasher */
-    hasher.update(Buffer.concat([secret, hash]));
+    hasher.update(Buffer.concat([_secret, _hash]));
 
     /* Get the digest */
     const digest = hasher.digest();
@@ -33,7 +49,10 @@ export class TelegramPassport {
     const decipher = createDecipheriv('aes-256-cbc', key, iv);
     decipher.setAutoPadding(false);
 
-    const dataPadded = Buffer.concat([decipher.update(data), decipher.final()]);
+    const dataPadded = Buffer.concat([
+      decipher.update(_data),
+      decipher.final(),
+    ]);
 
     /* Assert the data's integrity */
     const integrityHasher = createHash('sha256');
@@ -44,7 +63,7 @@ export class TelegramPassport {
     /* Get the digest */
     const dataHash = integrityHasher.digest();
 
-    if (!hash.equals(dataHash)) {
+    if (!_hash.equals(dataHash)) {
       throw new Error(ErrorMessages.ERR_DATA_INTEGRITY_CHECK_FAILED);
     }
 
@@ -59,11 +78,8 @@ export class TelegramPassport {
   decryptPassportCredentials(
     encryptedCredentials: EncryptedCredentials,
   ): Credentials {
-    /* Note that all Base64-encoded fields should be decoded before use */
-    const data = Buffer.from(encryptedCredentials.data, 'base64');
+    /* Base64-decode the secret before use */
     const secret = Buffer.from(encryptedCredentials.secret, 'base64');
-    const hash = Buffer.from(encryptedCredentials.hash, 'base64');
-
     /**
      * Decrypt the credentials secret (`secret` field in EncryptedCredentials)
      * using the private key (set OAEP padding option).
@@ -77,8 +93,98 @@ export class TelegramPassport {
     );
 
     /* Decrypt the data */
-    const _data = this.decryptData(data, decryptedSecret, hash);
+    const _data = this.decryptData(
+      encryptedCredentials.data,
+      decryptedSecret,
+      encryptedCredentials.hash,
+    );
 
     return JSON.parse(_data.toString());
+  }
+
+  decryptPassportData(passportData: PassportData): RequestedFields {
+    /* First, decrypt passport_data.credentials */
+    const credentials = this.decryptPassportCredentials(
+      passportData.credentials,
+    );
+
+    /* Init an empty fields object, so we can push data into it */
+    const fields: RequestedFields = {};
+
+    /* Loop through each `EncryptedPassportElement` in passportData.data */
+    for (const element of passportData.data) {
+      /* phone_number and email are not encrypted, so just pass them along */
+      if (element.type === 'phone_number' || element.type === 'email') {
+        fields[element.type] = element[element.type];
+      } else {
+        /* The other fields are objects, let's init their keys so we can set sub-keys */
+        (fields[element.type] as Indexable) = {};
+
+        /**
+         * Get the necessary credentials to decrypt the data.
+         * For each entry of `EncryptedPassportElement` that is not "type", "phone_number",
+         * "email" or "hash", there is a corresponding set of credentials in credentials.secure_data,
+         * idenfied by the same name of the entry.
+         */
+        const secureValue =
+          credentials.secure_data[element.type as SecureDataKey];
+
+        /* Loop through each of the remaining entries of the element */
+        for (const [key, value] of Object.entries(element)) {
+          /* Ignore "type" and "hash" */
+          if (key !== 'type' && key !== 'hash') {
+            /* "data" needs to be decrypted */
+            if (key === 'data') {
+              /* Decrypt "data" using the credentials form secure_data */
+              const data = this.decryptData(
+                element[key]!,
+                secureValue![key]!.secret,
+                secureValue![key]!.data_hash,
+              );
+
+              /* And assign it to its corresponding key on fields */
+              (fields[element.type] as Indexable)[key] = JSON.parse(
+                data.toString(),
+              );
+            } else {
+              /**
+               * Remaining fields of the element are either an Array of `PassportFile` for
+               * "files" and "translation", or a single `PassportFile` for "front_side",
+               * "reverse_side" and "selfie"
+               */
+              if (Array.isArray(value)) {
+                /**
+                 * In case of an Array, map it to a new Array and attach the credentials
+                 * to each one of the elements
+                 */
+                (fields[element.type] as Indexable)[key] = value.map(
+                  (file, index) => {
+                    file.credentials = (
+                      secureValue![key as SecureValueKey] as Array<unknown>
+                    )[index];
+                    return file;
+                  },
+                );
+              } else {
+                /* For a single PassportFile just assign it to its corresponding key */
+                (fields[element.type] as Indexable)[key] = value;
+
+                /* And attach the credentials */
+                (
+                  (fields[element.type] as Indexable)[
+                    key
+                  ] as PassportFileAndCredentials
+                ).credentials = secureValue![
+                  key as SecureValueKey
+                ] as FileCredentials;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    /* Return the processed data */
+    return fields;
   }
 }

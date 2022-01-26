@@ -1,3 +1,4 @@
+import { EncryptedPassportElementType } from '../utils/types';
 import { PassportFile } from './passport-file';
 
 /**
@@ -11,7 +12,8 @@ export interface EncryptedPassportElement {
    * “address”, “utility_bill”, “bank_statement”, “rental_agreement”, “passport_registration”,
    * “temporary_registration”, “phone_number”, “email”
    */
-  type: string;
+  // type: string;
+  type: EncryptedPassportElementType;
 
   /**
    * Optional. Base64-encoded encrypted Telegram Passport element data provided by the user.
