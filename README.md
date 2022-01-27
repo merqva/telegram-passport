@@ -15,7 +15,7 @@
 ## Usage
 - First, create a new instance of the `TelegramPassport` class
 ```
-const telegramPassport = new TelegramPassport("YOUR BOT'S PRIVATE KEY");
+const telegramPassport = new TelegramPassport(<bot_private_key>);
 ```
 - Parse and decryp de data of all the elements shared with the bot
 ```
@@ -34,6 +34,7 @@ const id_frontSide = data.identity_card.front_side;
 ...
 
 // decryp the file
+
 const file = telegramPassport.decryptData(
   <downloaded_file_data>,
   id_fronSide.secret,
