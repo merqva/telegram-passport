@@ -1,36 +1,80 @@
-import { Bill } from './bill';
-import { IdDocument } from './id-document';
-import { PersonalDetails } from './personal-details';
-import { ResidentialAddress } from './residential-address';
+import {
+  BillLike,
+  Data,
+  IdDocument,
+  PersonalDetails,
+  ResidentialAddress,
+} from '.';
 
+/**
+ * Represents the list of data types that can be requested, and the encrypted objects
+ * that will contain such data. All the fields are optional
+ * @see [Fields](https://core.telegram.org/passport#fields)
+ * @interface RequestedFields
+ */
 export interface RequestedFields {
-  personal_details?: {
-    data: PersonalDetails;
-  };
+  /**
+   * Personal Details
+   */
+  personal_details?: Data<PersonalDetails>;
 
+  /**
+   * Passport
+   */
   passport?: Exclude<IdDocument, 'reverse_side'>;
 
+  /**
+   * Internal Passport
+   */
   internal_passport?: IdDocument;
 
+  /**
+   * Driver License
+   */
   driver_license?: IdDocument;
 
+  /**
+   * Identity Card
+   */
   identity_card?: IdDocument;
 
-  address?: {
-    data: ResidentialAddress;
-  };
+  /**
+   * Address
+   */
+  address?: Data<ResidentialAddress>;
 
-  utility_bill?: Bill;
+  /**
+   * Utility Bill
+   */
+  utility_bill?: BillLike;
 
-  bank_statement?: Bill;
+  /**
+   * Bank Statement
+   */
+  bank_statement?: BillLike;
 
-  rental_agreement?: Bill;
+  /**
+   * Rental Agreement
+   */
+  rental_agreement?: BillLike;
 
-  passport_registration?: Bill;
+  /**
+   * Registration Page in the Internal Passport
+   */
+  passport_registration?: BillLike;
 
-  temporary_registration?: Bill;
+  /**
+   * Temporary Registration
+   */
+  temporary_registration?: BillLike;
 
+  /**
+   * Phone number
+   */
   phone_number?: string;
 
+  /**
+   * Email
+   */
   email?: string;
 }

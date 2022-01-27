@@ -1,23 +1,9 @@
+import { RequestedFields } from '..';
 import { SecureValue } from '../interfaces/secure-value';
 
-enum EncryptedPassportElementTypeValues {
-  personal_details,
-  passport,
-  internal_passport,
-  driver_license,
-  identity_card,
-  address,
-  utility_bill,
-  bank_statement,
-  rental_agreement,
-  passport_registration,
-  temporary_registration,
-  phone_number,
-  email,
-}
+export type StrBuff = string | Buffer;
 
-export type EncryptedPassportElementType =
-  keyof typeof EncryptedPassportElementTypeValues;
+export type EncryptedPassportElementType = keyof RequestedFields;
 
 export type SecureDataKey = Exclude<
   EncryptedPassportElementType,

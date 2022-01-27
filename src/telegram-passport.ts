@@ -8,25 +8,40 @@ import {
   Credentials,
   EncryptedCredentials,
   FileCredentials,
-  PassportFileAndCredentials,
   PassportData,
+  PassportFile,
   RequestedFields,
 } from './interfaces';
 import { ErrorMessages } from './constants';
-import { Indexable, SecureDataKey, SecureValueKey } from './utils';
+import { Indexable, SecureDataKey, SecureValueKey, StrBuff } from './utils';
 
+/**
+ * This class implements Telegram Passport incoming data decrytion for EncryptedCredentials
+ * and Files; and parsing/decryption of SecureData
+ * @see [Telegram Passport](https://core.telegram.org/passport)
+ */
 export class TelegramPassport {
+  /**
+   * @member Buffer to store the private key data (in PEM format)
+   */
   private readonly privateKey: Buffer;
 
-  constructor(privateKey: string | Buffer) {
+  /**
+   *
+   * @param privateKey - string or Buffer containing the private key data
+   */
+  constructor(privateKey: StrBuff) {
     this.privateKey = Buffer.from(privateKey);
   }
 
-  private decryptData(
-    data: string | Buffer,
-    secret: string | Buffer,
-    hash: string | Buffer,
-  ) {
+  /**
+   * @param data - string or Buffer containing the data to be decryted
+   * @param secret - string or Buffer containing the secret necessary for data decrytion
+   * @param hash - string or Buffer containing data hash, necessary for data integrity validation
+   * and to calculate key and initialization vector, for data decrytion
+   * @returns a Buffer containing the decrypted data
+   */
+  decryptData(data: StrBuff, secret: StrBuff, hash: StrBuff): Buffer {
     /* Note that all non-Buffer fields should be Base64-decoded before use */
     const _data = typeof data === 'string' ? Buffer.from(data, 'base64') : data;
     const _secret =
@@ -76,6 +91,10 @@ export class TelegramPassport {
     return dataPadded.slice(dataPadded[0], dataPadded.byteLength);
   }
 
+  /**
+   * @param encryptedCredentials - object containing the encryted credentials for data decryption
+   * @returns and object containing the decrypted credentials
+   */
   decryptPassportCredentials(
     encryptedCredentials: EncryptedCredentials,
   ): Credentials {
@@ -103,6 +122,10 @@ export class TelegramPassport {
     return JSON.parse(_data.toString());
   }
 
+  /**
+   * @param passportData - object containing the incoming passport data
+   * @returns an object containig all the parsed fields
+   */
   decryptPassportData(passportData: PassportData): RequestedFields {
     /* First, decrypt passport_data.credentials */
     const credentials = this.decryptPassportCredentials(
@@ -110,6 +133,7 @@ export class TelegramPassport {
     );
 
     /* Init an empty fields object, so we can push data into it */
+    // const fields: Record<string, unknown> = {};
     const fields: RequestedFields = {};
 
     /* Loop through each `EncryptedPassportElement` in passportData.data */
@@ -119,13 +143,13 @@ export class TelegramPassport {
         fields[element.type] = element[element.type];
       } else {
         /* The other fields are objects, let's init their keys so we can set sub-keys */
-        (fields[element.type] as Indexable) = {};
+        (fields[element.type] as unknown as Indexable) = {};
 
         /**
          * Get the necessary credentials to decrypt the data.
          * For each entry of `EncryptedPassportElement` that is not "type", "phone_number",
          * "email" or "hash", there is a corresponding set of credentials in credentials.secure_data,
-         * idenfied by the same name of the entry.
+         * idenfied by the same name of the entry
          */
         const secureValue =
           credentials.secure_data[element.type as SecureDataKey];
@@ -143,8 +167,8 @@ export class TelegramPassport {
                 secureValue![key]!.data_hash,
               );
 
-              /* And assign it to its corresponding key on fields */
-              (fields[element.type] as Indexable)[key] = JSON.parse(
+              /* And copy it to its corresponding key on fields */
+              (fields[element.type] as unknown as Indexable)[key] = JSON.parse(
                 data.toString(),
               );
             } else {
@@ -155,29 +179,26 @@ export class TelegramPassport {
                */
               if (Array.isArray(value)) {
                 /**
-                 * In case of an Array, map it to a new Array and attach the credentials
-                 * to each one of the elements
+                 * In the case of an Array, map it to a new Array and merge the credentials
+                 * into each one of the elements
                  */
-                (fields[element.type] as Indexable)[key] = value.map(
-                  (file, index) => {
-                    file.credentials = (
-                      secureValue![key as SecureValueKey] as Array<unknown>
-                    )[index];
-                    return file;
-                  },
+                (fields[element.type] as unknown as Indexable)[key] = (
+                  value as Array<PassportFile>
+                ).map<PassportFile & FileCredentials>(
+                  (passportFile, index) => ({
+                    ...passportFile,
+                    ...(
+                      secureValue![
+                        key as SecureValueKey
+                      ] as Array<FileCredentials>
+                    )[index],
+                  }),
                 );
               } else {
-                /* For a single PassportFile just assign it to its corresponding key */
-                (fields[element.type] as Indexable)[key] = value;
-
-                /* And attach the credentials */
-                (
-                  (fields[element.type] as Indexable)[
-                    key
-                  ] as PassportFileAndCredentials
-                ).credentials = secureValue![
-                  key as SecureValueKey
-                ] as FileCredentials;
+                (fields[element.type] as unknown as Indexable)[key] = {
+                  ...value,
+                  ...secureValue![key as SecureValueKey],
+                };
               }
             }
           }
@@ -185,7 +206,6 @@ export class TelegramPassport {
       }
     }
 
-    /* Return the processed data */
     return fields;
   }
 }

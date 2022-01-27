@@ -1,5 +1,4 @@
-import { DataCredentials } from './data-credentials';
-import { FileCredentials } from './file-credentials';
+import { DataCredentials, FileCredentials } from '.';
 
 /**
  * This object represents the credentials required to decrypt encrypted values.

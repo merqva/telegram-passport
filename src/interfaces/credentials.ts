@@ -1,4 +1,4 @@
-import { SecureData } from './secure-data';
+import { SecureData } from '.';
 
 /**
  * Credentials is a JSON-serialized object
