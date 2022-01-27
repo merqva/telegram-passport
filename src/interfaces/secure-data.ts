@@ -1,4 +1,4 @@
-import { SecureValue } from './secure-value';
+import { SecureValue } from '.';
 
 /**
  * This object represents the credentials required to decrypt encrypted data.
