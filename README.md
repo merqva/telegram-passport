@@ -6,7 +6,7 @@
 
 ## What does this library do?
 
-### Provided your Bot's Private Key, this libary will:
+### Provided your Bot's Private Key, this library will:
 
 - Decrypt the [EncryptedCredentials](https://core.telegram.org/bots/api#encryptedcredentials) object from the `credentials` field in [PassportData](https://core.telegram.org/bots/api#passportdata)
 - Parse the fields on each [EncryptedPassportElement](https://core.telegram.org/bots/api#encryptedpassportelement) from the `data` field in PassportData
