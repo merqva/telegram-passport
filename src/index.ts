@@ -1,1 +1,2 @@
-export { TelegramPassport } from './telegram-passport'
+export { TelegramPassport } from './telegram-passport';
+export * from './interfaces';
