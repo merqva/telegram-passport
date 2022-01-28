@@ -22,21 +22,23 @@
 
 - First, create a new instance of the `TelegramPassport` class
 
-```
-const telegramPassport = new TelegramPassport(<bot_private_key>);
+```typescript
+const telegramPassport = new TelegramPassport("<bot_private_key>");
 ```
 
 - Parse and decryp de data of all the elements shared with the bot
 
-```
-const data = telegramPassport.decryptPassportData(update.message.passport_data);
+```typescript
+const data = telegramPassport.decryptPassportData(
+    update.message.passport_data
+);
 ```
 
 #### \* `update` is the object representing the incoming [Update](https://core.telegram.org/bots/api#update) that was sent to the Bot<br/><br/>
 
 - Decryting files
 
-```
+```typescript
 /*
 get the data corresponding to the file you want to decryp
 for example, the front side of the id card
@@ -51,7 +53,7 @@ const id_frontSide = data.identity_card.front_side;
 // decryp the file
 
 const file = telegramPassport.decryptData(
-  <downloaded_file_data>,
+  downloaded_file_data,
   id_fronSide.secret,
   id_fronSide.file_hash,
 );
@@ -59,7 +61,7 @@ const file = telegramPassport.decryptData(
 
 - Depending on the fields you requested, you might not need to process the whole `PassportData` object; for example, the "phone_number" and "email" fields are not encrypted. Thus, you only need to decrypt the credentials to obtain the nonce, then, you can get "phone_number" and "email" from `passport_data.data`
 
-```
+```typescript
 /*
 in this case, data will look like this
 
