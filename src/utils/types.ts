@@ -7,7 +7,7 @@ export type EncryptedPassportElementType = keyof RequestedFields;
 
 export type SecureDataKey = Exclude<
   EncryptedPassportElementType,
-  'phone_number' | 'email'
+  'phone_number' | 'email' | 'nonce'
 >;
 
 export type SecureValueKey = keyof SecureValue;
