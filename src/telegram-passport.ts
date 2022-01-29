@@ -132,9 +132,8 @@ export class TelegramPassport {
       passportData.credentials,
     );
 
-    /* Init an empty fields object, so we can push data into it */
-    // const fields: Record<string, unknown> = {};
-    const fields: RequestedFields = {};
+    /* Init an fields object, with the nonce already in it */
+    const fields: RequestedFields = { nonce: credentials.nonce };
 
     /* Loop through each `EncryptedPassportElement` in passportData.data */
     for (const element of passportData.data) {
