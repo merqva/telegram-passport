@@ -1,6 +1,6 @@
 {
   "name": "@merqva/telegram-passport",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Decrypt/Parse incoming Telegram Passport data",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
