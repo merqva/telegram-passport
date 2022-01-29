@@ -23,7 +23,7 @@ export interface RequestedFields extends Omit<Credentials, 'secure_data'> {
   /**
    * Passport
    */
-  passport?: Exclude<IdDocument, 'reverse_side'>;
+  passport?: Omit<IdDocument, 'reverse_side'>;
 
   /**
    * Internal Passport
