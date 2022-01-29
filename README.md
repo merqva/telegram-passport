@@ -33,7 +33,7 @@ const data = telegramPassport.decryptPassportData(
     update.message.passport_data
 );
 
-// the nonce is retuned within RequestedFields object
+// the nonce is retuned within the RequestedFields object
 
 const nonce = data.nonce;
 ```
