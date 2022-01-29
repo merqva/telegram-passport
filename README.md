@@ -32,6 +32,10 @@ const telegramPassport = new TelegramPassport("<bot_private_key>");
 const data = telegramPassport.decryptPassportData(
     update.message.passport_data
 );
+
+// the nonce is retuned within RequestedFields object
+
+const nonce = data.nonce;
 ```
 
 #### \* `update` is the object representing the incoming [Update](https://core.telegram.org/bots/api#update) that was sent to the Bot<br/><br/>
