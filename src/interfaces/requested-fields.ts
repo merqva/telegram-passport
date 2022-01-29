@@ -1,5 +1,6 @@
 import {
   BillLike,
+  Credentials,
   Data,
   IdDocument,
   PersonalDetails,
@@ -8,11 +9,12 @@ import {
 
 /**
  * Represents the list of data types that can be requested, and the encrypted objects
- * that will contain such data. All the fields are optional
+ * that will contain such data. All these fields are optional. It also contains the
+ * Bot-specified nonce (always present)
  * @see [Fields](https://core.telegram.org/passport#fields)
  * @interface RequestedFields
  */
-export interface RequestedFields {
+export interface RequestedFields extends Omit<Credentials, 'secure_data'> {
   /**
    * Personal Details
    */
