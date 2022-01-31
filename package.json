@@ -2,50 +2,43 @@
   "name": "@merqva/telegram-passport",
   "version": "1.0.1",
   "description": "Decrypt/Parse incoming Telegram Passport data",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "types": "dist/types/index.d.js",
+  "homepage": "https://github.com/merqva/telegram-passport",
+  "author": "Yoel Navas <yn4v4s@gmail.com>",
+  "license": "MIT",
+  "main": "dist/index.js",
   "scripts": {
-    "build": "npm run build:cjs && npm run build:esm && npm run build:types",
-    "build:cjs": "rimraf dist/cjs && tsc -p config/tsconfig.cjs.json",
-    "build:esm": "rimraf dist/esm && tsc -p config/tsconfig.esm.json",
-    "build:types": "rimraf dist/types && tsc -p config/tsconfig.types.json",
-    "package": "npm run build && npm pack"
+    "build": "rimraf -rf dist && tsc -p tsconfig.json",
+    "format": "prettier --write \"{src,test}/**/*.ts\"",
+    "lint": "eslint 'src/**/*.ts' --fix",
+    "prepublish:npm": "npm run build",
+    "publish:npm": "npm publish --access public",
+    "prepublish:next": "npm run build",
+    "publish:next": "npm publish --access public --tag next"
   },
-  "publishConfig": {
-    "access": "public"
-  },
-  "files": [
-    "dist"
-  ],
   "keywords": [
     "telegram",
     "passport",
     "crypto",
     "typescript",
     "npm",
-    "package",
-    "cjs",
-    "esm"
+    "package"
   ],
-  "author": "Yoel Navas <yn4v4s@gmail.com>",
-  "license": "MIT",
-  "homepage": "https://github.com/merqva/telegram-passport",
+  "devDependencies": {
+    "@types/node": "^17.0.13",
+    "@typescript-eslint/eslint-plugin": "^5.10.1",
+    "@typescript-eslint/parser": "^5.10.1",
+    "eslint": "^8.8.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.5.1",
+    "rimraf": "3.0.2",
+    "typescript": "^4.5.5"
+  },
   "repository": {
     "type": "git",
     "url": "git@github.com:merqva/telegram-passport.git"
   },
   "bugs": {
     "url": "https://github.com/merqva/telegram-passport/issues"
-  },
-  "devDependencies": {
-    "@types/node": "^17.0.10",
-    "@typescript-eslint/eslint-plugin": "^4.31.1",
-    "@typescript-eslint/parser": "^4.31.1",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.4.0",
-    "typescript": "^4.4.3"
   }
 }
