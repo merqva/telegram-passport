@@ -13,7 +13,12 @@ import {
   RequestedFields,
 } from './interfaces';
 import { ErrorMessages } from './constants';
-import { Indexable, SecureDataKey, SecureValueKey, StrBuff } from './utils';
+import {
+  Indexable,
+  SecureDataKey,
+  SecureValueKey,
+  StringOrBuffer,
+} from './types';
 
 /**
  * This class implements Telegram Passport incoming data decrytion for EncryptedCredentials
@@ -30,7 +35,7 @@ export class TelegramPassport {
    *
    * @param privateKey - string or Buffer containing the private key data
    */
-  constructor(privateKey: StrBuff) {
+  constructor(privateKey: StringOrBuffer) {
     this.privateKey = Buffer.from(privateKey);
   }
 
@@ -41,7 +46,11 @@ export class TelegramPassport {
    * and to calculate key and initialization vector, for data decrytion
    * @returns a Buffer containing the decrypted data
    */
-  decryptData(data: StrBuff, secret: StrBuff, hash: StrBuff): Buffer {
+  decryptData(
+    data: StringOrBuffer,
+    secret: StringOrBuffer,
+    hash: StringOrBuffer,
+  ): Buffer {
     /* Note that all non-Buffer fields should be Base64-decoded before use */
     const _data = typeof data === 'string' ? Buffer.from(data, 'base64') : data;
     const _secret =
