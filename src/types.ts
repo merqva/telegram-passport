@@ -1,9 +1,10 @@
-import { RequestedFields } from '..';
-import { SecureValue } from '../interfaces/secure-value';
-
-export type StrBuff = string | Buffer;
+import { RequestedFields, SecureValue } from './interfaces';
 
 export type EncryptedPassportElementType = keyof RequestedFields;
+
+export type Indexable<T = unknown> = {
+  [key: string]: T;
+};
 
 export type SecureDataKey = Exclude<
   EncryptedPassportElementType,
@@ -11,3 +12,5 @@ export type SecureDataKey = Exclude<
 >;
 
 export type SecureValueKey = keyof SecureValue;
+
+export type StringOrBuffer = string | Buffer;
